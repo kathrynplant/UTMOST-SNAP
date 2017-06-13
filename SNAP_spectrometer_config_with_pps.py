@@ -10,18 +10,18 @@ This streamlines the SNAP configuration process.
 
 
 outline:
-cell 1 -- imports
+1. Imports
 
-cell 2 -- This description
+2. This description
 
-cell 3 -- Variables.  Ultimately these should be read from a configuration file.
+3. Variables.  Ultimately these will be read from a configuration file.
 
-cell 4 -- Defines functions
+4. Defines functions
 
-cell 5 -- Calls functions to configure the snap and packetizer
+5. Calls functions to configure the snap and packetizer
 
 TODO:
---Maybe make the configuration variables, including gain/shift be read from a file.
+--Maybe make the configuration variables, (including gain/shift ? ) be read from a file.
 
 
 '''
