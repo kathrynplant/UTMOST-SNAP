@@ -7,7 +7,6 @@ import time
 #------------------- Set configuration parameters --------------------
 PI_IP = '10.66.146.30' #string, IP of host raspberry pi
 
-#BOFFILE  = 'adc_to_gbe_pps_2017-3-29_2355.bof'
 BOFFILE = 'adc_to_gbe_pps_2017-4-3_2316.bof'
 
 SNAPID = 0xff #8 bit integer, identifies this particular snap board

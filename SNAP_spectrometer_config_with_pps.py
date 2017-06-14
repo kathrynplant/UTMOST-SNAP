@@ -40,16 +40,6 @@ DESTINATION_PORTS = [50000]*10 #list of integers, lists destination ports in ord
 
 #---------------------DEFINE CONFIGURATION FUNCTIONS ----------------------
 
-#def connect_to_snap(piip):
-#    # connect to snap
-#    r = corr.katcp_wrapper.FpgaClient(piip,7147)
-#    time.sleep(2)
-#    if r.is_connected():
-#        print 'Connected to SNAP'
-#    else:
-#        print 'Not connected to SNAP'
-#	exit()
-
 def progfpga(name_of_bof):
     #load the bof
     if name_of_bof in r.listbof():
