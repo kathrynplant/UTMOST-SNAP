@@ -34,9 +34,9 @@ SNAPID = 0xff #8 bit integer, identifies this particular snap board
 SNAPMAC = 0x02020a000002 #48 bit integers, MAC for SNAP
 SNAPIP  = 0x0a000002     # 32 bit integer, IP address of SNAP
 SNAPPORT = 50000   #integer, port number to send from
-DESTMACS = [0x0060DD46BFD9 for i in range(256)] #List of 256 48 bit integers, lists all possible destination MAC addresses
+DESTMACS = [0x0060DD46BFD9 for i in range(256)] #List of 256 48 bit integers, lists all possible destination MAC addresses. There must be exactly 256 addresses, even if all are the same.
 DESTINATION_IP_ADDRESSES = [0x0a000003]*10 #list of 32 bit integers, lists destination IP addresses in order of corresponding subbands
-DESTINATION_PORTS = [50000]*10 #list of integers, lists destination ports in order of corresponding subbands
+DESTINATION_PORTS = [50000]*10 #list of integers, lists destination ports in order of corresponding subbands. 
 
 #---------------------DEFINE CONFIGURATION FUNCTIONS ----------------------
 
