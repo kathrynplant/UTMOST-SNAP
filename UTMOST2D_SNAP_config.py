@@ -35,13 +35,14 @@ BOFFILE = 'two_2017-6-12_0040.bof' #string, name of bof
 
 SNAPID = 0xff #8 bit integer, identifies this particular snap board
 SNAPMAC = 0x02020a000002 #48 bit integers, MAC for SNAP
-SNAPIP  = 0x0a000002     # 32 bit integer, IP address of SNAP
+SNAPIP1  = 0x0a000001     # 32 bit integer, IP address of SNAP
+SNAPIP2  = 0x0a000002     # 32 bit integer, IP address of SNAP
 SNAPPORT1 = 50000   #integer, port number for ethernet1 to send from
-SNAPPORT2 = 50000   #integer, port number for ethernet2 to send from
+SNAPPORT2 = 30000   #integer, port number for ethernet2 to send from
 DESTMACS1 = [0x0060DD46BFD9 for i in range(256)] #List of 256 48 bit integers, lists all destination MAC addresses for ethernet1.
 DESTMACS2 = [0x0060DD46BFD9 for i in range(256)] #List of 256 48 bit integers, lists all destination MAC addresses for ethernet2.
-DESTINATION_IP_ADDRESSES = [0x0a000003]*20 #list of 32 bit integers, lists destination IP addresses in order of corresponding subbands. The first 10 are for ethernet1, the last 10 for ethernet2.
-DESTINATION_PORTS = [50000]*20 #list of integers, lists destination ports in order of corresponding subbands. The first 10 are for ethernet 1, the last 10 are for ethernet 2.
+DESTINATION_IP_ADDRESSES = [0x0a000003]*10 +[0x0a000103]*10 #list of 32-bit integers, lists destination IP addresses in order of corresponding subbands. The first 10 are for ethernet1, the last 10 for ethernet2.
+DESTINATION_PORTS = [50000]*10 + [30000]*10 #list of integers, lists destination ports in order of corresponding subbands. The first 10 are for ethernet 1, the last 10 are for ethernet 2.
 
 # Define band(s) to send
 START_CHANNEL_1 = 330 # Lowest channel number of the set of 320 channels to send out the first ethernet port.
@@ -78,8 +79,8 @@ def progfpga(name_of_bof):
 def configurethernet():
     # configure ethernet
     print 'Configuring the 10Gb ethernet'
-    r.config_10gbe_core('gbe1',SNAPMAC,SNAPIP,SNAPPORT1,DESTMACS1,gateway = 0)
-    r.config_10gbe_core('gbe2',SNAPMAC,SNAPIP,SNAPPORT2,DESTMACS2,gateway = 0)
+    r.config_10gbe_core('gbe1',SNAPMAC,SNAPIP1,SNAPPORT1,DESTMACS1,gateway = 0)
+    r.config_10gbe_core('gbe2',SNAPMAC,SNAPIP2,SNAPPORT2,DESTMACS2,gateway = 0)
 
     # Does it automatically iterate through mac addresses as IP changes?  How?
     print 'Configuring destination IP addresses and ports'
