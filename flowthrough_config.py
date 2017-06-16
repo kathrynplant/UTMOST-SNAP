@@ -5,17 +5,78 @@ import struct
 import time
 
 #------------------- Set configuration parameters --------------------
-PI_IP = '10.66.146.30' #string, IP of host raspberry pi
 
-BOFFILE = 'adc_to_gbe_pps_2017-4-3_2316.bof'
+# def line parser
+def lineparse(line):
+    for i in range(len(line)):
+        if line[i] == '=':
+            keysplit = line[:i]
+            valsplit = line[(i+1):]
+            key = keysplit.strip()
+            value = valsplit.strip()
+    return key , value
 
-SNAPID = 0xff #8 bit integer, identifies this particular snap board
-SNAPMAC = 0x02020a000002 #48 bit integers, MAC for SNAP
-SNAPIP  = 0x0a000002     # 32 bit integer, IP address of SNAP
-SNAPPORT = 50000   #integer, port number to send from
-DESTMACS = [0x0060DD46BFD9 for i in range(256)] #List of 256 48 bit integers, lists all possible destination MAC addresses
-DEST_IP = 0x0a000003 #32 bit integer, destination IP (only one is possible in flow-through mode).
-DEST_PORT = 50000 #destination port (only one is possible in flow-through mode).
+# load config file
+configfile = r'sampleconfig_flowthrough.txt'
+print 'Using config file', configfile
+with open(configfile) as f:
+    raw = f.readlines()
+lines = [x.strip() for x in raw]
+textlines = [x for x  in lines if ((len(x) > 0) and (x[0] != '#'))]
+
+# make dictionary of parameter keywords and their values
+paramdict = {}
+fails = 0
+for line in textlines:
+    key, value = lineparse(line)
+    try:
+        paramdict[key] = eval(value)
+    except:
+        print 'Could not evaluate', key, ' ', value
+        print sys.exc_info()[1]
+        fails +=1
+if fails > 0:
+    print 'Failed parsing config parameters.  Please correct the config file.'
+    exit()
+
+# Check that all the necessary parameters have been included, and no invalid parameters have been included.
+valid = ['PI_IP',
+         'BOFFILE',
+         'SNAPID',
+         'SNAPMAC',
+         'SNAPIP',
+         'SNAPPORT',
+         'DESTMACS',
+         'DEST_IP',
+         'DEST_PORT']
+
+invalidcount = 0
+missingcount = 0
+for k in valid:
+    if k not in paramdict.keys():
+        print 'Missing ', k, ' please add it to the config file.'
+        missingcount +=1
+for k in paramdict.keys():
+    if k not in valid:
+        print 'Invalid parameter', k
+        invalidcount+=1
+if (invalidcount + missingcount) > 0:
+    print 'Please make sure that you\'re using a config file which includes all of these parameters and only these parameters:'
+    print valid
+    exit()
+
+# Define variables
+PI_IP = paramdict['PI_IP'] #string, IP of host raspberry pi
+BOFFILE = paramdict['BOFFILE'] #string, name of bof
+SNAPID = paramdict['SNAPID']        #8 bit integer, identifies this particular snap board
+SNAPMAC = paramdict['SNAPMAC']      #48 bit integers, MAC for SNAP
+SNAPIP  = paramdict['SNAPIP']     # 32 bit integer, IP address of SNAP
+SNAPPORT =paramdict['SNAPPORT']   #integer, port number for ethernet1 to send from
+DESTMACS = paramdict['DESTMACS']  #List of 256 48 bit integers, lists all destination MAC addresses for ethernet1.
+DEST_IP = paramdict['DEST_IP'] #list of 32-bit integers, lists destination IP addresses in order of corresponding subbands. The first 10 are for ethernet1, the last 10 for ethernet2.
+DEST_PORT =  paramdict['DEST_PORT'] #list of integers, lists destination ports in order of corresponding subbands. The first 10 are for ethernet 1, the last 10 are for ethernet 2.
+
+
 
 #----------------------- Define relevant functions ---------------------
 def connect_to_snap(piip):
