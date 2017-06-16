@@ -1,0 +1,57 @@
+# This is a sample file of configuration parameters for the UTMOST2D firmware.
+# It will be read by the code that programs the FPGA and configures the f-engine and packetiser.
+# Comments are allowed as entire lines, but not at the end of a line.
+# Parameter values may be short python expressions which do not include the character '='.
+# The parameters may be defined in any order.
+
+# What the parser will do:
+# 1. Read lines as strings.
+# 2. Throw away blank lines and lines that start with '#'.
+# 3. Separate each string into a keyword string and a value string, and then evaluate the value string.
+# 4. Make a dictionary of keys and values.
+# 5. Check that every keyword is a valid parameter and that every required parameter has a value.  
+
+
+PI_IP = '10.66.146.30'
+#string, IP of host raspberry pi
+
+BOFFILE = 'two_2017-6-12_0040.bof'
+#string, name of bof
+
+SNAPID = 0xff
+#8 bit integer, identifies this particular snap board
+
+SNAPMAC = 0x02020a000002 
+#48 bit integers, MAC for SNAP
+
+SNAPIP1  = 0x0a000001     
+# 32 bit integer, IP address of SNAP
+
+SNAPIP2  = 0x0a000002     
+# 32 bit integer, IP address of SNAP
+
+SNAPPORT1 = 50000   
+#integer, port number for ethernet1 to send from
+
+SNAPPORT2 = 30000   
+#integer, port number for ethernet2 to send from
+
+DESTMACS1 = [0x0060DD46BFD9 for i in range(256)]
+#List of 256 48 bit integers, lists all destination MAC addresses for ethernet1.
+
+DESTMACS2 = [0x0060DD46BFD9 for i in range(256)] 
+#List of 256 48 bit integers, lists all destination MAC addresses for ethernet2.
+
+DESTINATION_IP_ADDRESSES = [0x0a000003]*10 +[0x0a000103]*10 
+#list of 32-bit integers, lists destination IP addresses in order of corresponding subbands. The first 10 are for ethernet1, the last 10 for ethernet2.
+
+DESTINATION_PORTS = [50000]*10 + [30000]*10 
+#list of integers, lists destination ports in order of corresponding subbands. The first 10 are for ethernet 1, the last 10 are for ethernet 2.
+
+# Define band(s) to send
+START_CHANNEL_1 = 330
+# Lowest channel number of the set of 320 channels to send out the first ethernet port.
+
+START_CHANNEL_2 = 10
+# Lowest channel number of the set of 320 channels to send out the second ethernet port.
+

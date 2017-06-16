@@ -1,52 +1,111 @@
-from __future__ import division
-import corr
-import numpy as np
-import matplotlib.pyplot as plt
-import struct
-import time
-
 '''
 This streamlines the SNAP configuration process.
 
 This is the same as SNAP_spectrometer_config_with_pps.py (as of 8 June), but updated for the UTMOST firmware.
 
 outline:
-cell 1 -- imports
+1. imports
 
-cell 2 -- This description
+2. Parse arguments.
 
-cell 3 -- Variables.  Ultimately these should be read from a configuration file.
+3. Defines parameters from a configuration file.
 
-cell 4 -- Defines functions
+4. Defines functions
 
-cell 5 -- Calls functions to configure the snap and packetizer
+5. Calls functions to configure the snap and packetizer
 
 TODO:
---Maybe make the configuration variables, including gain/shift be read from a file.
---So far I've not done this because these rarely change, and when they do it's so far been easier to just edit them here, where their use and format is most clear.
+--Maybe include setting gain and shift. Currently that's done separately.
 
 '''
+from __future__ import division
+import corr
+import numpy as np
+import matplotlib.pyplot as plt
+import struct
+import time
+import sys
+
 #---------------------- DEFINE CONFIGURATION PARAMETERS --------------------
+# def line parser
+def lineparse(line):
+    for i in range(len(line)):
+        if line[i] == '=':
+            keysplit = line[:i]
+            valsplit = line[(i+1):]
+            key = keysplit.strip()
+            value = valsplit.strip()
+    return key , value
 
-PI_IP = '10.66.146.30' #string, IP of host raspberry pi
-#BOFFILE  = 'spectrometer_new3_2016-11-14_1539.bof' #string, name of bof
-#BOFFILE  = 'spectrometer_new4_2017-2-6_1437.bof' #string, name of bof
-BOFFILE = 'two_2017-6-12_0040.bof' #string, name of bof
+# load config file
+configfile = r'sampleconfig_UTMOST2D.txt'
+print 'Using config file', configfile
+with open(configfile) as f:
+    raw = f.readlines()
+lines = [x.strip() for x in raw]
+textlines = [x for x  in lines if ((len(x) > 0) and (x[0] != '#'))]
 
-SNAPID = 0xff #8 bit integer, identifies this particular snap board
-SNAPMAC = 0x02020a000002 #48 bit integers, MAC for SNAP
-SNAPIP1  = 0x0a000001     # 32 bit integer, IP address of SNAP
-SNAPIP2  = 0x0a000002     # 32 bit integer, IP address of SNAP
-SNAPPORT1 = 50000   #integer, port number for ethernet1 to send from
-SNAPPORT2 = 30000   #integer, port number for ethernet2 to send from
-DESTMACS1 = [0x0060DD46BFD9 for i in range(256)] #List of 256 48 bit integers, lists all destination MAC addresses for ethernet1.
-DESTMACS2 = [0x0060DD46BFD9 for i in range(256)] #List of 256 48 bit integers, lists all destination MAC addresses for ethernet2.
-DESTINATION_IP_ADDRESSES = [0x0a000003]*10 +[0x0a000103]*10 #list of 32-bit integers, lists destination IP addresses in order of corresponding subbands. The first 10 are for ethernet1, the last 10 for ethernet2.
-DESTINATION_PORTS = [50000]*10 + [30000]*10 #list of integers, lists destination ports in order of corresponding subbands. The first 10 are for ethernet 1, the last 10 are for ethernet 2.
+# make dictionary of parameter keywords and their values
+paramdict = {}
+fails = 0
+for line in textlines:
+    key, value = lineparse(line)
+    try:
+        paramdict[key] = eval(value)
+    except:
+        print 'Could not evaluate', key, ' ', value
+        print sys.exc_info()[1]
+        fails +=1
+if fails > 0:
+    print 'Failed parsing config parameters.  Please correct the config file.'
+    exit()
 
-# Define band(s) to send
-START_CHANNEL_1 = 330 # Lowest channel number of the set of 320 channels to send out the first ethernet port.
-START_CHANNEL_2 = 10  # Lowest channel number of the set of 320 channels to send out the second ethernet port.
+# Check that all the necessary parameters have been included, and no invalid parameters have been included.
+valid = ['PI_IP', 
+         'BOFFILE', 
+         'SNAPID', 
+         'SNAPMAC', 
+         'SNAPIP1',
+         'SNAPIP2',
+         'SNAPPORT1',
+         'SNAPPORT2',
+         'DESTMACS1',
+         'DESTMACS2',
+         'DESTMACS2',
+         'DESTINATION_IP_ADDRESSES',
+         'DESTINATION_PORTS',
+         'START_CHANNEL_1',
+         'START_CHANNEL_2']
+invalidcount = 0
+missingcount = 0
+for k in valid:
+    if k not in paramdict.keys():
+        print 'Missing ', k, ' please add it to the config file.'
+        missingcount +=1
+for k in paramdict.keys():
+    if k not in valid:
+        print 'Invalid parameter', k
+        invalidcount+=1
+if (invalidcount + missingcount) > 0:
+    print 'Please make sure that you\'re using a config file which includes all of these parameters and only these parameters:'
+    print valid
+    exit()
+
+# Define variables
+PI_IP = paramdict['PI_IP'] #string, IP of host raspberry pi
+BOFFILE = paramdict['BOFFILE'] #string, name of bof
+SNAPID = paramdict['SNAPID']        #8 bit integer, identifies this particular snap board
+SNAPMAC = paramdict['SNAPMAC']      #48 bit integers, MAC for SNAP
+SNAPIP1  = paramdict['SNAPIP1']     # 32 bit integer, IP address of SNAP
+SNAPIP2  = paramdict['SNAPIP2']     # 32 bit integer, IP address of SNAP
+SNAPPORT1 =paramdict['SNAPPORT1']   #integer, port number for ethernet1 to send from
+SNAPPORT2 = paramdict['SNAPPORT2']  #integer, port number for ethernet2 to send from
+DESTMACS1 = paramdict['DESTMACS1']  #List of 256 48 bit integers, lists all destination MAC addresses for ethernet1.
+DESTMACS2 = paramdict['DESTMACS2']  #List of 256 48 bit integers, lists all destination MAC addresses for ethernet2.
+DESTINATION_IP_ADDRESSES = paramdict['DESTINATION_IP_ADDRESSES'] #list of 32-bit integers, lists destination IP addresses in order of corresponding subbands. The first 10 are for ethernet1, the last 10 for ethernet2.
+DESTINATION_PORTS =  paramdict['DESTINATION_PORTS'] #list of integers, lists destination ports in order of corresponding subbands. The first 10 are for ethernet 1, the last 10 are for ethernet 2.
+START_CHANNEL_1 = paramdict['START_CHANNEL_1'] # Lowest channel number of the set of 320 channels to send out the first ethernet port.
+START_CHANNEL_2 = paramdict['START_CHANNEL_2']  # Lowest channel number of the set of 320 channels to send out the second ethernet port.
 
 #---------------------DEFINE CONFIGURATION FUNCTIONS ----------------------
 
