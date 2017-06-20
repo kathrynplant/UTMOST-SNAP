@@ -177,7 +177,7 @@ progfpga(BOFFILE)
        
 # set SNAP board identifier
 r.write_int('pkt_header_SNAPid',SNAPID)
-
+r.write_int('pkt_header_SNAPid1', SNAPID)
 # configure ethernet
 configurethernet()
 

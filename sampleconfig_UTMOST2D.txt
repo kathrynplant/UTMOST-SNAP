@@ -24,10 +24,10 @@ SNAPID = 0xff
 SNAPMAC = 0x02020a000002 
 #48 bit integers, MAC for SNAP
 
-SNAPIP1  = 0x0a000001     
+SNAPIP1  = 0x0a000002     
 # 32 bit integer, IP address of SNAP
 
-SNAPIP2  = 0x0a000002     
+SNAPIP2  = 0x0a000102     
 # 32 bit integer, IP address of SNAP
 
 SNAPPORT1 = 50000   
@@ -39,7 +39,7 @@ SNAPPORT2 = 30000
 DESTMACS1 = [0x0060DD46BFD9 for i in range(256)]
 #List of 256 48 bit integers, lists all destination MAC addresses for ethernet1.
 
-DESTMACS2 = [0x0060DD46BFD9 for i in range(256)] 
+DESTMACS2 = [0x0060DD46922E for i in range(256)] 
 #List of 256 48 bit integers, lists all destination MAC addresses for ethernet2.
 
 DESTINATION_IP_ADDRESSES = [0x0a000003]*10 +[0x0a000103]*10 
