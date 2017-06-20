@@ -1,9 +1,9 @@
 from __future__ import division
 import corr
 import numpy as np
-import matplotlib.pyplot as plt
 import struct
 import time
+from argparse import ArgumentParser
 
 '''
 This streamlines the SNAP configuration process.
@@ -20,12 +20,16 @@ outline:
 
 5. Calls functions to configure the snap and packetizer
 
-TODO:
---Maybe make the configuration variables, (including gain/shift ? ) be read from a file.
-
 
 '''
 #---------------------- DEFINE CONFIGURATION PARAMETERS --------------------
+
+#Parse command line argument
+p = ArgumentParser(description = 'python SNAP_spectrometer_config_with_pps.py configfile.txt')
+p.add_argument('configfile', type = str, default = '', help = 'Give the name of the file with the configuration parameters.')
+args = p.parse_args()
+configfile = args.configfile
+
 # def line parser
 def lineparse(line):
     for i in range(len(line)):
@@ -37,7 +41,6 @@ def lineparse(line):
     return key , value
 
 # load config file
-configfile = r'sampleconfig_SNAP_spectrometer.txt'
 print 'Using config file', configfile
 with open(configfile) as f:
     raw = f.readlines()
@@ -81,7 +84,7 @@ for k in paramdict.keys():
         print 'Invalid parameter', k
         invalidcount+=1
 if (invalidcount + missingcount) > 0:
-    print 'Please make sure that you\'re using a config file which includes all of these parameters and only these parameters:'
+    print 'Please make sure that you\'re using a config file which includes all of the following parameters and no other parameters:'
     print valid
     exit()
 
@@ -204,7 +207,7 @@ time.sleep(0.1)
 resetandsync()
 
 # Finish with a reminder to set the ADC demux
-print "Now run 'python ~/adc16/adc16_init.py %s  -s -d 1 -g <adcgain>'" %(PI_IP + ' ' + BOFFILE)
+print "Now run Zara's ADC calibration. Run \n python ~/adc16/adc16_init.py %s  -s -d 1 -g <adcgain>" %(PI_IP + ' ' + BOFFILE)
 
 print "Don't forget to adjust the digital gains"
 

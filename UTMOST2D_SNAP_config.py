@@ -21,12 +21,20 @@ TODO:
 from __future__ import division
 import corr
 import numpy as np
-import matplotlib.pyplot as plt
 import struct
 import time
 import sys
 
+from argparse import ArgumentParser
+
 #---------------------- DEFINE CONFIGURATION PARAMETERS --------------------
+
+#Parse command line argument
+p = ArgumentParser(description = 'python UTMOST2D_SNAP_config.py configfile.txt')
+p.add_argument('configfile', type = str, default = '', help = 'Give the name of the file with the configuration parameters.')
+args = p.parse_args()
+configfile = args.configfile
+
 # def line parser
 def lineparse(line):
     for i in range(len(line)):
@@ -38,7 +46,6 @@ def lineparse(line):
     return key , value
 
 # load config file
-configfile = r'sampleconfig_UTMOST2D.txt'
 print 'Using config file', configfile
 with open(configfile) as f:
     raw = f.readlines()
@@ -86,7 +93,7 @@ for k in paramdict.keys():
         print 'Invalid parameter', k
         invalidcount+=1
 if (invalidcount + missingcount) > 0:
-    print 'Please make sure that you\'re using a config file which includes all of these parameters and only these parameters:'
+    print 'Please make sure that you\'re using a config file which includes all of the following parameters and no other parameters:'
     print valid
     exit()
 
@@ -222,7 +229,7 @@ resetandsync()
 print 'Done.'
 
 # Finish with a reminder to set the ADC demux
-print "Next, calibrate the ADCs with Zuhra's script. Run: \n 'python ~/adc16/adc16_init.py %s  -s -d 1 -g <adcgain>'" %(PI_IP + ' ' + BOFFILE)
+print "Next, calibrate the ADCs with Zara's script. Run: \n 'python ~/adc16/adc16_init.py %s  -s -d 1 -g <adcgain>'" %(PI_IP + ' ' + BOFFILE)
 
 print "Don't forget to adjust the digital gains using set_gain.py."
 
