@@ -51,7 +51,13 @@ If diagnostics.py finds nothing wrong and packets still aren't appearing, the ne
 
 BRAM_timeseries_capture.py
 
-This reads raw ADC output from BRAM in blocks of 1024 timesamples. It plots a timeseries of one of the data streams and histograms for four data streams.  This is useful for checking the ADC levels when adjusting the power of the input RF signal. When used with f-engine firmware, all four data streams from any one ADC chip are written to BRAM. When used with flow through mode, any four data streams can be selected. Options are explained in the help text.
+This reads raw ADC output from BRAM in blocks of 1024 timesamples. It plots a timeseries of one of the data streams and histograms for four data streams.  This is useful for checking the ADC levels when adjusting the power of the input RF signal. When used with f-engine firmware, all four data streams from any one ADC chip are written to BRAM. When used with flow through mode, any four data streams can be selected. The histogram bins are defined as the ADC states, such that the plotted histogram is a count of how many times each state is used. 
+
+The full list of command-line options are explained in the help text, but a couple options to note are:
+
+-i specifies the number of times to read the BRAM to accumulate a sample to bin in for the histogram plot.
+
+-p prints the rms of each integration to a file, where the name of the output file is the argument.  For example, you can observe a solar transit by recording the rms of the ADC states for an hour or so, which is an easy rough estimate of a pointing test.  
 
 ## Quick Instructions for F-engine Start-up, e.g. after a power outage:
 
